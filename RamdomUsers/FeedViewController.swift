@@ -160,7 +160,10 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
         }
         
         if switchKM.on {
-            return photos.onekmElements(self.location!).filtredElements(self.filtredText).count
+            guard let mylocation = self.location else {
+                return 0
+            }
+            return photos.onekmElements(mylocation).filtredElements(self.filtredText).count
         }
         
         return photos.filtredElements(self.filtredText).count
