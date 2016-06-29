@@ -168,6 +168,8 @@ class User : NSObject {
             }
             print("tarea: \(self!.photoUrl) nombre: \(self!.email) progreso:\(progress!)")
             
+            guard self?.delegate != nil else {return}
+            
             self!.delegate?.isDownloading(progress!, email: self!.email)
             
             guard file != nil else {

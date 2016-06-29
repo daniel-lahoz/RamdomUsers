@@ -86,6 +86,7 @@ class UserCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        photo?.delegate = nil
         photo = nil
     }
     
@@ -102,35 +103,7 @@ class UserCell: UICollectionViewCell {
     }
     
     @IBAction func touchFile(sender: AnyObject) {
-        
         self.photo?.downloadFile()
-        
-        /*
-        fileTask?.cancel()
-
-        let url = NSURL(string: "http://www.proyectos-simed.es/firmacorreo/DrUrbano.m4v")
-        
-        fileTask = NetworkClient.sharedInstance.getFileInBackground(url!) { [weak self] (file, progress, error) in
-            guard error == nil else {
-                return
-            }
-            
-            guard progress != nil else {
-                return
-            }
-            print("tarea: \(self!.photo?.photoUrl) progreso:\(progress)")
-            self?.progressbar.hidden = false
-            self?.progressbar.progress = progress!
-            
-            guard file != nil else {
-                return
-            }
-            
-            self?.progressbar.hidden = true
-
-            
-        }
- */
     }
 
 
@@ -139,20 +112,18 @@ class UserCell: UICollectionViewCell {
 extension UserCell : UserDelegate{
     
     func isDownloading(progress: Float, email: String){
-        
-        if email == self.emailLabel.text{
-            if progress < 0.99 {
-                self.progressbar.hidden = false
-                self.progressbar.progress = progress
-                print("lblemail: \(self.emailLabel.text)")
-            }else{
-                self.progressbar.hidden = true
-            }
+
+        if progress < 0.99 {
+            self.progressbar.hidden = false
+            self.progressbar.progress = progress
+            print("lblemail: \(self.emailLabel.text)")
         }else{
-             self.progressbar.hidden = true
+            self.progressbar.hidden = true
         }
         
     }
+    
+    
 }
 
 
