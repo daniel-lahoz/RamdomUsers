@@ -7,7 +7,8 @@ enum NetworkClientError: ErrorType {
 }
 
 typealias NetworkResult = (AnyObject?, ErrorType?) -> Void
-typealias ImageResult = (UIImage?, ErrorType?) -> Void
+//typealias ImageResult = (UIImage?, ErrorType?) -> Void
+typealias ImageResult = (UIImage?, Float?, ErrorType?) -> Void
 
 class NetworkClient: NSObject {
   private var urlSession: NSURLSession
@@ -85,7 +86,7 @@ extension NetworkClient: NSURLSessionDelegate, NSURLSessionDownloadDelegate {
     if let error = error, url = task.originalRequest?.URL, completion = completionHandlers[url] {
       completionHandlers[url] = nil
       NSOperationQueue.mainQueue().addOperationWithBlock {
-        completion(nil, error)
+        completion(nil, nil, error)
       }
     }
   }
@@ -98,19 +99,32 @@ extension NetworkClient: NSURLSessionDelegate, NSURLSessionDownloadDelegate {
       if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
         completionHandlers[url] = nil
         NSOperationQueue.mainQueue().addOperationWithBlock {
-          completion(image, nil)
+          completion(image, 1.0, nil)
         }
       }
     } else {
       if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
         completionHandlers[url] = nil
         NSOperationQueue.mainQueue().addOperationWithBlock {
-          completion(nil, NetworkClientError.ImageData)
+          completion(nil, nil, NetworkClientError.ImageData)
         }
       }
     }
   }
+    
 
+    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        
+        if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
+            let progress : Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                    completion(nil, progress, nil)
+            }
+        }
+
+    
+    }
+    
   func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
     if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate, completionHandler = appDelegate.backgroundSessionCompletionHandler {
       appDelegate.backgroundSessionCompletionHandler = nil

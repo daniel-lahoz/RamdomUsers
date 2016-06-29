@@ -84,10 +84,11 @@ class User: NSObject {
     init(dictionary values: NSDictionary) {
         
         guard let media = values["picture"] as? NSDictionary,
-          urlString = media["thumbnail"] as? String, url = NSURL(string: urlString) else {
+          urlString = media["large"] as? String, url = NSURL(string: urlString) else {
           fatalError("User item could not be created: " + values.description)
         }
         photoUrl = url
+
         
         guard let namedicc = values["name"] as? NSDictionary,
             first = namedicc["first"] as? String, last = namedicc["last"] as? String else {

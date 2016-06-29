@@ -124,6 +124,10 @@ class FeedViewController: UIViewController {
         self.collectionView.reloadData()
     }
     
+    @IBAction func filtredChanged(textField: UITextField) {
+        self.filtredText = textField.text!
+        self.collectionView.reloadData()
+    }
     
     @IBAction func closeDetailView(sender: AnyObject) {
         
@@ -294,10 +298,6 @@ extension FeedViewController: UserCellDelegate {
         
     }
     
-    @IBAction func filtredChanged(textField: UITextField) {
-        self.filtredText = textField.text!
-        self.collectionView.reloadData()
-    }
 }
 
 

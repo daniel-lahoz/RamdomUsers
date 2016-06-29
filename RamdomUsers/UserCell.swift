@@ -22,6 +22,7 @@ class UserCell: UICollectionViewCell {
     @IBOutlet weak var favoriteButton: UIButton!
     @IBOutlet weak var photoButton: UIButton!
     
+    @IBOutlet weak var progressbar: UIProgressView!
     
 
     var imageTask: NSURLSessionDownloadTask?
@@ -54,12 +55,24 @@ class UserCell: UICollectionViewCell {
             }
             
             
-            imageTask = NetworkClient.sharedInstance.getImageInBackground(photoUrl) { [weak self] (image, error) in
+            imageTask = NetworkClient.sharedInstance.getImageInBackground(photoUrl) { [weak self] (image, progress, error) in
                 guard error == nil else {
                     self?.photoImageView.image = UIImage(named: "Broken")
                     return
                 }
                 
+                guard progress != nil else {
+                    return
+                }
+                print("tarea: \(self!.photo?.photoUrl) progreso:\(progress)")
+                self?.progressbar.hidden = false
+                self?.progressbar.progress = progress!
+                
+                guard image != nil else {
+                    return
+                }
+                
+                self?.progressbar.hidden = true
                 self?.photoImageView.image = image
                 self?.photo?.image = image!.copy() as? UIImage
             

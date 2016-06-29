@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="LWA-sw-SKz">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -84,6 +85,12 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5u8-wy-4As">
+                                                    <rect key="frame" x="8" y="90" width="284" height="2"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="2" id="0oN-vo-EZv"/>
+                                                    </constraints>
+                                                </progressView>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>
@@ -93,6 +100,7 @@
                                             <constraint firstItem="OLm-Nx-ZUl" firstAttribute="centerY" secondItem="lQm-4b-mlO" secondAttribute="centerY" id="0tG-sM-9d3"/>
                                             <constraint firstAttribute="trailing" secondItem="WLX-YI-uzT" secondAttribute="trailing" constant="200" id="4XX-yZ-p2d"/>
                                             <constraint firstItem="OLm-Nx-ZUl" firstAttribute="bottom" secondItem="WLX-YI-uzT" secondAttribute="bottom" id="500-iY-n3S"/>
+                                            <constraint firstAttribute="trailing" secondItem="5u8-wy-4As" secondAttribute="trailing" constant="8" id="5Tp-tD-2j3"/>
                                             <constraint firstItem="Ijf-0u-opy" firstAttribute="trailing" secondItem="aur-T7-Is5" secondAttribute="trailingMargin" id="6Q5-CK-LIz"/>
                                             <constraint firstAttribute="bottom" secondItem="WLX-YI-uzT" secondAttribute="bottom" id="78F-41-O2a"/>
                                             <constraint firstItem="lQm-4b-mlO" firstAttribute="trailing" secondItem="agg-k7-X2d" secondAttribute="trailing" id="8ZR-Im-0Va"/>
@@ -102,6 +110,7 @@
                                             <constraint firstItem="NWx-R3-xZE" firstAttribute="leading" secondItem="lQm-4b-mlO" secondAttribute="leading" id="G4Y-RS-cyH"/>
                                             <constraint firstItem="WLX-YI-uzT" firstAttribute="top" secondItem="aur-T7-Is5" secondAttribute="top" id="RhY-15-bdQ"/>
                                             <constraint firstItem="lQm-4b-mlO" firstAttribute="top" secondItem="NWx-R3-xZE" secondAttribute="bottom" constant="15" id="Upo-tn-j2F"/>
+                                            <constraint firstAttribute="bottom" secondItem="5u8-wy-4As" secondAttribute="bottom" constant="8" id="Vng-92-uLU"/>
                                             <constraint firstItem="agg-k7-X2d" firstAttribute="bottom" secondItem="aur-T7-Is5" secondAttribute="bottomMargin" id="Xc2-oC-TBK"/>
                                             <constraint firstItem="Ijf-0u-opy" firstAttribute="leading" secondItem="NWx-R3-xZE" secondAttribute="trailing" constant="7" id="YOF-8L-YoM"/>
                                             <constraint firstItem="OLm-Nx-ZUl" firstAttribute="leading" secondItem="WLX-YI-uzT" secondAttribute="leading" id="cc9-v2-YPg"/>
@@ -111,6 +120,7 @@
                                             <constraint firstItem="NWx-R3-xZE" firstAttribute="top" secondItem="aur-T7-Is5" secondAttribute="topMargin" id="hTp-sF-daa"/>
                                             <constraint firstItem="agg-k7-X2d" firstAttribute="top" secondItem="lQm-4b-mlO" secondAttribute="bottom" constant="15" id="mqO-wX-Svh"/>
                                             <constraint firstItem="NWx-R3-xZE" firstAttribute="trailing" secondItem="lQm-4b-mlO" secondAttribute="trailing" id="nBi-tB-5M1"/>
+                                            <constraint firstItem="5u8-wy-4As" firstAttribute="leading" secondItem="aur-T7-Is5" secondAttribute="leading" constant="8" id="niI-Pr-UfD"/>
                                             <constraint firstItem="agg-k7-X2d" firstAttribute="bottom" secondItem="Tys-qY-ue8" secondAttribute="bottom" id="r6Q-Wn-Iw4"/>
                                             <constraint firstItem="Ijf-0u-opy" firstAttribute="leading" secondItem="Tys-qY-ue8" secondAttribute="leading" id="wn0-MI-fRd"/>
                                             <constraint firstItem="OLm-Nx-ZUl" firstAttribute="trailing" secondItem="WLX-YI-uzT" secondAttribute="trailing" id="xwD-fT-qFZ"/>
@@ -122,6 +132,7 @@
                                             <outlet property="phoneLabel" destination="agg-k7-X2d" id="Ntj-ws-udp"/>
                                             <outlet property="photoButton" destination="OLm-Nx-ZUl" id="3pN-DM-K59"/>
                                             <outlet property="photoImageView" destination="WLX-YI-uzT" id="1T2-13-Aae"/>
+                                            <outlet property="progressbar" destination="5u8-wy-4As" id="SBD-BO-fts"/>
                                             <outlet property="removeButton" destination="Ijf-0u-opy" id="TFb-Rq-4Df"/>
                                         </connections>
                                     </collectionViewCell>
