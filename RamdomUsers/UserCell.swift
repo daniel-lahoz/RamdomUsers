@@ -26,10 +26,14 @@ class UserCell: UICollectionViewCell {
     
 
     var imageTask: NSURLSessionDownloadTask?
+    var fileTask: NSURLSessionDownloadTask?
 
     var photo: User? {
         didSet {
             imageTask?.cancel()
+            
+            photo?.delegate = self
+            progressbar.hidden = true
             
             //print("User: \(photo?.description)")
             if let name = photo?.name, surname = photo?.surname, email = photo?.email, phone = photo?.phone  {
@@ -97,6 +101,58 @@ class UserCell: UICollectionViewCell {
          delegate?.didTouchFavorite(self)
     }
     
+    @IBAction func touchFile(sender: AnyObject) {
+        
+        self.photo?.downloadFile()
+        
+        /*
+        fileTask?.cancel()
+
+        let url = NSURL(string: "http://www.proyectos-simed.es/firmacorreo/DrUrbano.m4v")
+        
+        fileTask = NetworkClient.sharedInstance.getFileInBackground(url!) { [weak self] (file, progress, error) in
+            guard error == nil else {
+                return
+            }
+            
+            guard progress != nil else {
+                return
+            }
+            print("tarea: \(self!.photo?.photoUrl) progreso:\(progress)")
+            self?.progressbar.hidden = false
+            self?.progressbar.progress = progress!
+            
+            guard file != nil else {
+                return
+            }
+            
+            self?.progressbar.hidden = true
+
+            
+        }
+ */
+    }
+
+
+}
+
+extension UserCell : UserDelegate{
+    
+    func isDownloading(progress: Float, email: String){
+        
+        if email == self.emailLabel.text{
+            if progress < 0.99 {
+                self.progressbar.hidden = false
+                self.progressbar.progress = progress
+                print("lblemail: \(self.emailLabel.text)")
+            }else{
+                self.progressbar.hidden = true
+            }
+        }else{
+             self.progressbar.hidden = true
+        }
+        
+    }
 }
 
 

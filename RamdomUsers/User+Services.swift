@@ -13,7 +13,7 @@ extension User {
     
   class func getAllFeedPhotos(completion: UserResult) {
     
-    guard let url = NSURL(string: "http://api.randomuser.me/?results=30") else {
+    guard let url = NSURL(string: "http://api.randomuser.me/?results=300") else {
       completion(nil, UserServiceError.URLParsing)
       return
     }

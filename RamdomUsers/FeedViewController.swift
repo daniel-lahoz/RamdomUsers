@@ -176,6 +176,7 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
         let cell: UICollectionViewCell
+        //We force non reuse cells
         
         if switchKM.on {
             if let photos = self.photos?.onekmElements(self.location!).filtredElements(self.filtredText) where self.photos!.onekmElements(self.location!).filtredElements(self.filtredText).count > 0 {
@@ -218,6 +219,10 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
                 if let photos = self.photos?.filtredElements(self.filtredText) where self.photos!.filtredElements(self.filtredText).count > 0 {
                     
                     let userCell = collectionView.dequeueReusableCellWithReuseIdentifier(cellIdentifier, forIndexPath: indexPath) as! UserCell
+//                    let identi = "ident-\(indexPath.section)-\(indexPath.row)-\(indexPath.item)-"
+//                    let nib = UINib(nibName: "UserCell", bundle: nil)
+//                    collectionView.registerNib(nib, forCellWithReuseIdentifier: identi)
+//                    let userCell = collectionView.dequeueReusableCellWithReuseIdentifier(identi, forIndexPath: indexPath) as! UserCell
                     
                     userCell.delegate = self
                     userCell.photo = photos[indexPath.item]
@@ -297,6 +302,7 @@ extension FeedViewController: UserCellDelegate {
         self.collectionView.reloadData()
         
     }
+    
     
 }
 

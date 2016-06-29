@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6564B1561D23E5F40021E1A1 /* UserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6564B1551D23E5F40021E1A1 /* UserCell.xib */; };
 		65CB7DE61D1960CE006205E7 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65CB7DE51D1960CE006205E7 /* CoreLocation.framework */; };
 		B404F7951C6664640074645E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B404F7941C6664640074645E /* AppDelegate.swift */; };
 		B404F7971C6664640074645E /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B404F7961C6664640074645E /* FeedViewController.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6564B1551D23E5F40021E1A1 /* UserCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserCell.xib; sourceTree = "<group>"; };
 		65CB7DE51D1960CE006205E7 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		B404F7911C6664640074645E /* RamdomUsers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RamdomUsers.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B404F7941C6664640074645E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				B404F7981C6664640074645E /* Main.storyboard */,
+				6564B1551D23E5F40021E1A1 /* UserCell.xib */,
 				B404F7961C6664640074645E /* FeedViewController.swift */,
 				B404F7A91C6668AD0074645E /* UserCell.swift */,
 				B404F7AB1C6669B20074645E /* MessageCell.swift */,
@@ -173,6 +176,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6564B1561D23E5F40021E1A1 /* UserCell.xib in Resources */,
 				B404F79F1C6664640074645E /* LaunchScreen.storyboard in Resources */,
 				B404F79C1C6664640074645E /* Assets.xcassets in Resources */,
 				B404F79A1C6664640074645E /* Main.storyboard in Resources */,

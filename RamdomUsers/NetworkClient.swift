@@ -3,25 +3,35 @@
 import UIKit
 
 enum NetworkClientError: ErrorType {
-  case ImageData
+    case ImageData
+    case FileData
 }
 
 typealias NetworkResult = (AnyObject?, ErrorType?) -> Void
 //typealias ImageResult = (UIImage?, ErrorType?) -> Void
 typealias ImageResult = (UIImage?, Float?, ErrorType?) -> Void
+typealias FileResult = (NSData?, Float?, ErrorType?) -> Void
+
+let kBackgroundSessionID = "api.randomuser.me"
+let kFileBackgroundSession = "file"
 
 class NetworkClient: NSObject {
   private var urlSession: NSURLSession
   private var backgroundSession: NSURLSession!
+    private var fileBackgroundSession: NSURLSession!
   private var completionHandlers = [NSURL: ImageResult]()
+    private var fileHandlers = [NSURL: FileResult]()
   static let sharedInstance = NetworkClient()
 
   override init() {
     let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
     urlSession = NSURLSession(configuration: configuration)
     super.init()
-    let backgroundConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("api.randomuser.me")
+    let backgroundConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(kBackgroundSessionID)
     backgroundSession = NSURLSession(configuration: backgroundConfiguration, delegate: self, delegateQueue: nil)
+    let fileBackgroundConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(kFileBackgroundSession)
+    fileBackgroundSession = NSURLSession(configuration: fileBackgroundConfiguration, delegate: self, delegateQueue: nil)
+
   }
 
   // MARK: service methods
@@ -47,6 +57,14 @@ class NetworkClient: NSObject {
     task.resume()
     return task
   }
+    
+    func getFileInBackground(url: NSURL, completion: FileResult?) -> NSURLSessionDownloadTask {
+        fileHandlers[url] = completion
+        let request = NSURLRequest(URL: url)
+        let task = fileBackgroundSession.downloadTaskWithRequest(request)
+        task.resume()
+        return task
+    }
 
   // MARK: helper methods
 
@@ -81,54 +99,109 @@ class NetworkClient: NSObject {
   }
 }
 
+
+
 extension NetworkClient: NSURLSessionDelegate, NSURLSessionDownloadDelegate {
+    
+    
   func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-    if let error = error, url = task.originalRequest?.URL, completion = completionHandlers[url] {
-      completionHandlers[url] = nil
-      NSOperationQueue.mainQueue().addOperationWithBlock {
-        completion(nil, nil, error)
-      }
+    
+    if session.configuration.identifier == kFileBackgroundSession{
+        if let error = error, url = task.originalRequest?.URL, completion = fileHandlers[url] {
+            fileHandlers[url] = nil
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                completion(nil, nil, error)
+            }
+        }
+    }else if session.configuration.identifier == kBackgroundSessionID{
+        if let error = error, url = task.originalRequest?.URL, completion = completionHandlers[url] {
+            completionHandlers[url] = nil
+            NSOperationQueue.mainQueue().addOperationWithBlock {
+                completion(nil, nil, error)
+            }
+        }
     }
+    
   }
 
   func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
-    // You must move the file or open it for reading before this closure returns or it will be deleted
-    if let data = NSData(contentsOfURL: location), image = UIImage(data: data), request = downloadTask.originalRequest, response = downloadTask.response {
-      let cachedResponse = NSCachedURLResponse(response: response, data: data)
-      self.urlSession.configuration.URLCache?.storeCachedResponse(cachedResponse, forRequest: request)
-      if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
-        completionHandlers[url] = nil
-        NSOperationQueue.mainQueue().addOperationWithBlock {
-          completion(image, 1.0, nil)
+    
+    if session.configuration.identifier == kFileBackgroundSession{
+        // You must move the file or open it for reading before this closure returns or it will be deleted
+        if let data = NSData(contentsOfURL: location), request = downloadTask.originalRequest, response = downloadTask.response {
+            let cachedResponse = NSCachedURLResponse(response: response, data: data)
+            self.urlSession.configuration.URLCache?.storeCachedResponse(cachedResponse, forRequest: request)
+            if let url = downloadTask.originalRequest?.URL, completion = fileHandlers[url] {
+                fileHandlers[url] = nil
+                NSOperationQueue.mainQueue().addOperationWithBlock {
+                    completion(data, 1.0, nil)
+                }
+            }
+        } else {
+            if let url = downloadTask.originalRequest?.URL, completion = fileHandlers[url] {
+                fileHandlers[url] = nil
+                NSOperationQueue.mainQueue().addOperationWithBlock {
+                    completion(nil, nil, NetworkClientError.FileData)
+                }
+            }
         }
-      }
-    } else {
-      if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
-        completionHandlers[url] = nil
-        NSOperationQueue.mainQueue().addOperationWithBlock {
-          completion(nil, nil, NetworkClientError.ImageData)
+    }else if session.configuration.identifier == kBackgroundSessionID{
+        // You must move the file or open it for reading before this closure returns or it will be deleted
+        if let data = NSData(contentsOfURL: location), image = UIImage(data: data), request = downloadTask.originalRequest, response = downloadTask.response {
+            let cachedResponse = NSCachedURLResponse(response: response, data: data)
+            self.urlSession.configuration.URLCache?.storeCachedResponse(cachedResponse, forRequest: request)
+            if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
+                completionHandlers[url] = nil
+                NSOperationQueue.mainQueue().addOperationWithBlock {
+                    completion(image, 1.0, nil)
+                }
+            }
+        } else {
+            if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
+                completionHandlers[url] = nil
+                NSOperationQueue.mainQueue().addOperationWithBlock {
+                    completion(nil, nil, NetworkClientError.ImageData)
+                }
+            }
         }
-      }
     }
+    
+
   }
     
 
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
-        if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
-            let progress : Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-            NSOperationQueue.mainQueue().addOperationWithBlock {
+        if session.configuration.identifier == kFileBackgroundSession{
+            if let url = downloadTask.originalRequest?.URL, completion = fileHandlers[url] {
+                let progress : Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+                NSOperationQueue.mainQueue().addOperationWithBlock {
                     completion(nil, progress, nil)
+                }
+            }
+        }else if session.configuration.identifier == kBackgroundSessionID{
+            if let url = downloadTask.originalRequest?.URL, completion = completionHandlers[url] {
+                let progress : Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+                NSOperationQueue.mainQueue().addOperationWithBlock {
+                    completion(nil, progress, nil)
+                }
             }
         }
+        
+
 
     
     }
     
   func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-    if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate, completionHandler = appDelegate.backgroundSessionCompletionHandler {
-      appDelegate.backgroundSessionCompletionHandler = nil
-      completionHandler()
-    }
+
+        if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate, completionHandler = appDelegate.backgroundSessionCompletionHandler {
+            appDelegate.backgroundSessionCompletionHandler = nil
+            completionHandler()
+        }
+
   }
+    
+    
+    
 }

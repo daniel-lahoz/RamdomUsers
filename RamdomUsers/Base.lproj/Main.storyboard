@@ -91,6 +91,15 @@
                                                         <constraint firstAttribute="height" constant="2" id="0oN-vo-EZv"/>
                                                     </constraints>
                                                 </progressView>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JIn-nz-cVy">
+                                                    <rect key="frame" x="218" y="35" width="74" height="30"/>
+                                                    <state key="normal" title="Download!">
+                                                        <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="touchFile:" destination="aur-T7-Is5" eventType="touchUpInside" id="DO3-pI-Qli"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </view>

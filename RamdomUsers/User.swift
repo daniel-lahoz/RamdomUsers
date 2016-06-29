@@ -41,8 +41,15 @@ import UIKit
  "nat": "AU"
  **/
 
-class User: NSObject {
 
+protocol UserDelegate: class {
+    func isDownloading(progress: Float, email: String)
+}
+
+class User : NSObject {
+
+    weak var delegate:UserDelegate?
+    
     var photoUrl: NSURL
     var favorite = false
     var name: String
@@ -56,6 +63,8 @@ class User: NSObject {
     var registered: Int
     var gender: String
     var fakelocation: CLLocation
+    
+    var fileTask: NSURLSessionDownloadTask?
     
     var image: UIImage? {
         get{
@@ -84,7 +93,7 @@ class User: NSObject {
     init(dictionary values: NSDictionary) {
         
         guard let media = values["picture"] as? NSDictionary,
-          urlString = media["large"] as? String, url = NSURL(string: urlString) else {
+          urlString = media["thumbnail"] as? String, url = NSURL(string: urlString) else {
           fatalError("User item could not be created: " + values.description)
         }
         photoUrl = url
@@ -141,6 +150,35 @@ class User: NSObject {
         fakelocation = CLLocation(latitude: latitud, longitude: longitud)
         
     }
+    
+    
+    func downloadFile() {
+        
+        fileTask?.cancel()
+        
+        let url = NSURL(string: "http://www.proyectos-simed.es/firmacorreo/DrUrbano.m4v")
+        
+        fileTask = NetworkClient.sharedInstance.getFileInBackground(url!) { [weak self] (file, progress, error) in
+            guard error == nil else {
+                return
+            }
+            
+            guard progress != nil else {
+                return
+            }
+            print("tarea: \(self!.photoUrl) nombre: \(self!.email) progreso:\(progress!)")
+            
+            self!.delegate?.isDownloading(progress!, email: self!.email)
+            
+            guard file != nil else {
+                return
+            }
+            
+            
+            
+        }
+    }
+    
     
     override var description : String {
         return "User \(name) \(surname) \(phone) \(email) \(photoUrl.absoluteString) \(image?.size) \n"
