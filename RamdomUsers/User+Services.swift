@@ -1,19 +1,19 @@
 
 import Foundation
 
-enum UserServiceError: String, ErrorType {
+enum UserServiceError: String, Error {
   case NotImplemented = "This feature has not been implemented yet"
   case URLParsing = "Sorry, there was an error getting the photos"
   case JSONStructure = "Sorry, the photo service returned something different than expected"
 }
 
-typealias UserResult = ([User]?, ErrorType?) -> Void
+typealias UserResult = ([User]?, Error?) -> Void
 
 extension User {
     
-  class func getAllFeedPhotos(completion: UserResult) {
+  class func getAllFeedPhotos(_ completion: @escaping UserResult) {
     
-    guard let url = NSURL(string: "http://api.randomuser.me/?results=30") else {
+    guard let url = URL(string: "http://api.randomuser.me/?results=30") else {
       completion(nil, UserServiceError.URLParsing)
       return
     }
@@ -23,7 +23,7 @@ extension User {
         completion(nil, error)
         return
       }
-      if let dictionary = result as? NSDictionary, items = dictionary["results"] as? [NSDictionary] {
+      if let dictionary = result as? NSDictionary, let items = dictionary["results"] as? [NSDictionary] {
         var photos = [User]()
         for item in items {
           photos.append(User(dictionary: item))

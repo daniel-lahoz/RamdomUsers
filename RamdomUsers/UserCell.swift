@@ -3,9 +3,9 @@
 import UIKit
 
 protocol UserCellDelegate: class {
-    func didTouchFavorite(sender: UserCell)
-    func didTouchPhoto(sender: UserCell)
-    func didRemove(sender: UserCell)
+    func didTouchFavorite(_ sender: UserCell)
+    func didTouchPhoto(_ sender: UserCell)
+    func didRemove(_ sender: UserCell)
 }
 
 
@@ -25,27 +25,27 @@ class UserCell: UICollectionViewCell {
     @IBOutlet weak var progressbar: UIProgressView!
     
 
-    var imageTask: NSURLSessionDownloadTask?
-    var fileTask: NSURLSessionDownloadTask?
+    var imageTask: URLSessionDownloadTask?
+    var fileTask: URLSessionDownloadTask?
 
     var photo: User? {
         didSet {
             imageTask?.cancel()
             
             photo?.delegate = self
-            progressbar.hidden = true
+            progressbar.isHidden = true
             
             //print("User: \(photo?.description)")
-            if let name = photo?.name, surname = photo?.surname, email = photo?.email, phone = photo?.phone  {
+            if let name = photo?.name, let surname = photo?.surname, let email = photo?.email, let phone = photo?.phone  {
                 nameLabel.text = "\(name) \(surname)"
                 emailLabel.text = email
                 phoneLabel.text = phone
             }
             
             if photo?.favorite == true{
-                favoriteButton.setTitleColor(UIColor.greenColor(), forState: .Normal)
+                favoriteButton.setTitleColor(UIColor.green, for: UIControlState())
             }else{
-                favoriteButton.setTitleColor(UIColor.purpleColor(), forState: .Normal)
+                favoriteButton.setTitleColor(UIColor.purple, for: UIControlState())
             }
             
             if let storedImage = photo?.image{
@@ -68,15 +68,15 @@ class UserCell: UICollectionViewCell {
                 guard progress != nil else {
                     return
                 }
-                print("tarea: \(self!.photo?.photoUrl) progreso:\(progress)")
-                self?.progressbar.hidden = false
+                print("tarea: \(String(describing: self!.photo?.photoUrl)) progreso:\(String(describing: progress))")
+                self?.progressbar.isHidden = false
                 self?.progressbar.progress = progress!
                 
                 guard image != nil else {
                     return
                 }
                 
-                self?.progressbar.hidden = true
+                self?.progressbar.isHidden = true
                 self?.photoImageView.image = image
                 self?.photo?.image = image!.copy() as? UIImage
             
@@ -90,19 +90,19 @@ class UserCell: UICollectionViewCell {
         photo = nil
     }
     
-    @IBAction func touchPhoto(sender: AnyObject) {
+    @IBAction func touchPhoto(_ sender: AnyObject) {
         delegate?.didTouchPhoto(self)
     }
     
-    @IBAction func touchRemove(sender: AnyObject) {
+    @IBAction func touchRemove(_ sender: AnyObject) {
         delegate?.didRemove(self)
     }
     
-    @IBAction func touchFavorite(sender: AnyObject) {
+    @IBAction func touchFavorite(_ sender: AnyObject) {
          delegate?.didTouchFavorite(self)
     }
     
-    @IBAction func touchFile(sender: AnyObject) {
+    @IBAction func touchFile(_ sender: AnyObject) {
         self.photo?.downloadFile()
     }
 
@@ -111,14 +111,14 @@ class UserCell: UICollectionViewCell {
 
 extension UserCell : UserDelegate{
     
-    func isDownloading(progress: Float, email: String){
+    func isDownloading(_ progress: Float, email: String){
 
         if progress < 0.99 {
-            self.progressbar.hidden = false
+            self.progressbar.isHidden = false
             self.progressbar.progress = progress
-            print("lblemail: \(self.emailLabel.text)")
+            print("lblemail: \(String(describing: self.emailLabel.text))")
         }else{
-            self.progressbar.hidden = true
+            self.progressbar.isHidden = true
         }
         
     }

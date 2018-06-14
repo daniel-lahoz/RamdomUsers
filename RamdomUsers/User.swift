@@ -43,14 +43,14 @@ import UIKit
 
 
 protocol UserDelegate: class {
-    func isDownloading(progress: Float, email: String)
+    func isDownloading(_ progress: Float, email: String)
 }
 
 class User : NSObject {
 
     weak var delegate:UserDelegate?
     
-    var photoUrl: NSURL
+    var photoUrl: URL
     var favorite = false
     var name: String
     var surname: String
@@ -60,17 +60,17 @@ class User : NSObject {
     var city: String
     var state: String
     var postcode: String
-    var registered: Int
+    var registered: String
     var gender: String
     var fakelocation: CLLocation
     
-    var fileTask: NSURLSessionDownloadTask?
+    var fileTask: URLSessionDownloadTask?
     
     var image: UIImage? {
         get{
-            let documentsURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
-            let fileURL = documentsURL.URLByAppendingPathComponent("\(self.name)-\(self.surname)-\(self.registered).png")
-            guard let data = NSData(contentsOfURL: fileURL) else{
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let fileURL = documentsURL.appendingPathComponent("\(self.name)-\(self.surname)-\(self.registered).png")
+            guard let data = try? Data(contentsOf: fileURL) else{
                 return nil
             }
             let myImage =  UIImage(data: data)
@@ -78,10 +78,10 @@ class User : NSObject {
 
         }
         set (newValue){
-            let documentsURL = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
-                let fileURL = documentsURL.URLByAppendingPathComponent("\(self.name)-\(self.surname)-\(self.registered).png")
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                let fileURL = documentsURL.appendingPathComponent("\(self.name)-\(self.surname)-\(self.registered).png")
                 if let jpegImageData = UIImageJPEGRepresentation(newValue!, 1.0){
-                    jpegImageData.writeToURL(fileURL, atomically: false)
+                    try? jpegImageData.write(to: fileURL, options: [])
                 }
         }
 
@@ -93,14 +93,14 @@ class User : NSObject {
     init(dictionary values: NSDictionary) {
         
         guard let media = values["picture"] as? NSDictionary,
-          urlString = media["thumbnail"] as? String, url = NSURL(string: urlString) else {
+          let urlString = media["thumbnail"] as? String, let url = URL(string: urlString) else {
           fatalError("User item could not be created: " + values.description)
         }
         photoUrl = url
 
         
         guard let namedicc = values["name"] as? NSDictionary,
-            first = namedicc["first"] as? String, last = namedicc["last"] as? String else {
+            let first = namedicc["first"] as? String, let last = namedicc["last"] as? String else {
                 fatalError("User item could not be created: " + values.description)
         }
         name = first
@@ -117,8 +117,8 @@ class User : NSObject {
         phone = aphone
         
         guard let locdicc = values["location"] as? NSDictionary,
-            astreet = locdicc["street"] as? String, acity = locdicc["city"] as? String,
-            astate = locdicc["state"] as? String else {
+            let astreet = locdicc["street"] as? String, let acity = locdicc["city"] as? String,
+            let astate = locdicc["state"] as? String else {
                 fatalError("User item could not be created: " + values.description)
         }
         street = astreet
@@ -126,12 +126,12 @@ class User : NSObject {
         state = astate
         
         guard let locdicc2 = values["location"] as? NSDictionary,
-            apostcode = locdicc2["postcode"]  else {
+            let apostcode = locdicc2["postcode"]  else {
                 fatalError("User item could not be created: " + values.description)
         }
-        postcode = String(apostcode)
+        postcode = String(describing: apostcode)
         
-        guard let aregistered = values["registered"] as? Int else {
+        guard let aregistered = values["registered"] as? String else {
             fatalError("User item could not be created: " + values.description)
         }
         registered = aregistered
@@ -156,7 +156,7 @@ class User : NSObject {
         
         fileTask?.cancel()
         
-        let url = NSURL(string: "http://www.proyectos-simed.es/firmacorreo/DrUrbano.m4v")
+        let url = URL(string: "http://www.proyectos-simed.es/firmacorreo/DrUrbano.m4v")
         
         fileTask = NetworkClient.sharedInstance.getFileInBackground(url!) { [weak self] (file, progress, error) in
             guard error == nil else {
@@ -183,7 +183,7 @@ class User : NSObject {
     
     
     override var description : String {
-        return "User \(name) \(surname) \(phone) \(email) \(photoUrl.absoluteString) \(image?.size) \n"
+        return "User \(name) \(surname) \(phone) \(email) \(photoUrl.absoluteString) \(String(describing: image?.size)) \n"
     }
 }
 

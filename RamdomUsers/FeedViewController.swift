@@ -56,7 +56,7 @@ class FeedViewController: UIViewController {
           guard error == nil else {
             if let error = error as? UserServiceError {
               self?.currentMessage = error.rawValue
-            } else if let error = error as? NSError {
+            } else if let error = error as NSError? {
               self?.currentMessage = error.localizedDescription
             } else {
               self?.currentMessage = "Sorry, there was an error."
@@ -71,14 +71,14 @@ class FeedViewController: UIViewController {
         }
     }
 
-    override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
-        UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveEaseInOut, animations: {
+    override func didRotate(from fromInterfaceOrientation: UIInterfaceOrientation) {
+        UIView.animate(withDuration: 0.3, delay: 0.0, options: UIViewAnimationOptions(), animations: {
             self.detailView.center = self.view.center
         }) { _ in}
     }
 
     
-    @IBAction func touchAddMoreContacts(sender: AnyObject) {
+    @IBAction func touchAddMoreContacts(_ sender: AnyObject) {
         
         User.getAllFeedPhotos { [weak self] (photos, error) in
             guard error == nil else {
@@ -89,7 +89,7 @@ class FeedViewController: UIViewController {
             let photosListOld = self!.photos!
             self?.photos = photosListNew + photosListOld
             
-            if self!.switchgender.on {
+            if self!.switchgender.isOn {
                 self!.photos?.sortByGender()
             }else{
                 self!.photos?.sortByName()
@@ -102,8 +102,8 @@ class FeedViewController: UIViewController {
 
     }
     
-    @IBAction func sortgenderChange(genderSwitch: UISwitch) {
-        if genderSwitch.on {
+    @IBAction func sortgenderChange(_ genderSwitch: UISwitch) {
+        if genderSwitch.isOn {
             self.photos?.sortByGender()
         }else{
             self.photos?.sortByName()
@@ -114,27 +114,27 @@ class FeedViewController: UIViewController {
     }
     
     
-    @IBAction func filtredOnlyFavorites(sender: AnyObject) {
-        self.switchKM.on = false
+    @IBAction func filtredOnlyFavorites(_ sender: AnyObject) {
+        self.switchKM.isOn = false
         self.collectionView.reloadData()
     }
     
-    @IBAction func onekmChanges(sender: AnyObject) {
-        self.switchFavorites.on = false
+    @IBAction func onekmChanges(_ sender: AnyObject) {
+        self.switchFavorites.isOn = false
         self.collectionView.reloadData()
     }
     
-    @IBAction func filtredChanged(textField: UITextField) {
+    @IBAction func filtredChanged(_ textField: UITextField) {
         self.filtredText = textField.text!
         self.collectionView.reloadData()
     }
     
-    @IBAction func closeDetailView(sender: AnyObject) {
+    @IBAction func closeDetailView(_ sender: AnyObject) {
         
         
-        UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveEaseInOut, animations: {
+        UIView.animate(withDuration: 0.3, delay: 0.0, options: UIViewAnimationOptions(), animations: {
             
-            let senderFrame = self.collectionView.convertRect(self.activeUserCell!.frame, toView: self.view)
+            let senderFrame = self.collectionView.convert(self.activeUserCell!.frame, to: self.view)
             self.detailView.frame = senderFrame
             
             self.view.layoutIfNeeded()
@@ -156,14 +156,14 @@ class FeedViewController: UIViewController {
 
 extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let photos = photos else { return 1 }
         
-        if switchFavorites.on {
+        if switchFavorites.isOn {
             return photos.favoriteElements().filtredElements(self.filtredText).count
         }
         
-        if switchKM.on {
+        if switchKM.isOn {
             guard let mylocation = self.location else {
                 return 0
             }
@@ -173,66 +173,66 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
         return photos.filtredElements(self.filtredText).count
     }
 
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell: UICollectionViewCell
         //We force non reuse cells
         
-        if switchKM.on {
-            if let photos = self.photos?.onekmElements(self.location!).filtredElements(self.filtredText) where self.photos!.onekmElements(self.location!).filtredElements(self.filtredText).count > 0 {
+        if switchKM.isOn {
+            if let photos = self.photos?.onekmElements(self.location!).filtredElements(self.filtredText) , self.photos!.onekmElements(self.location!).filtredElements(self.filtredText).count > 0 {
                 
-                let userCell = collectionView.dequeueReusableCellWithReuseIdentifier(cellIdentifier, forIndexPath: indexPath) as! UserCell
+                let userCell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! UserCell
                 
                 userCell.delegate = self
-                userCell.photo = photos[indexPath.item]
+                userCell.photo = photos[(indexPath as NSIndexPath).item]
                 cell = userCell
                 
             } else {
-                let messageCell = collectionView.dequeueReusableCellWithReuseIdentifier(messageCellIdentifier, forIndexPath: indexPath) as! MessageCell
+                let messageCell = collectionView.dequeueReusableCell(withReuseIdentifier: messageCellIdentifier, for: indexPath) as! MessageCell
                 
                 messageCell.messageLabel.text = currentMessage
-                messageCell.messageLabel.hidden = false
+                messageCell.messageLabel.isHidden = false
                 cell = messageCell
                 
             }
         
         }else{
             
-            if switchFavorites.on {
-                if let photos = self.photos?.favoriteElements().filtredElements(self.filtredText) where self.photos!.favoriteElements().filtredElements(self.filtredText).count > 0 {
+            if switchFavorites.isOn {
+                if let photos = self.photos?.favoriteElements().filtredElements(self.filtredText) , self.photos!.favoriteElements().filtredElements(self.filtredText).count > 0 {
                     
-                    let userCell = collectionView.dequeueReusableCellWithReuseIdentifier(cellIdentifier, forIndexPath: indexPath) as! UserCell
+                    let userCell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! UserCell
                     
                     userCell.delegate = self
-                    userCell.photo = photos[indexPath.item]
+                    userCell.photo = photos[(indexPath as NSIndexPath).item]
                     cell = userCell
                     
                 } else {
-                    let messageCell = collectionView.dequeueReusableCellWithReuseIdentifier(messageCellIdentifier, forIndexPath: indexPath) as! MessageCell
+                    let messageCell = collectionView.dequeueReusableCell(withReuseIdentifier: messageCellIdentifier, for: indexPath) as! MessageCell
                     
                     messageCell.messageLabel.text = currentMessage
-                    messageCell.messageLabel.hidden = false
+                    messageCell.messageLabel.isHidden = false
                     cell = messageCell
                     
                 }
             }else{
-                if let photos = self.photos?.filtredElements(self.filtredText) where self.photos!.filtredElements(self.filtredText).count > 0 {
+                if let photos = self.photos?.filtredElements(self.filtredText) , self.photos!.filtredElements(self.filtredText).count > 0 {
                     
-                    let userCell = collectionView.dequeueReusableCellWithReuseIdentifier(cellIdentifier, forIndexPath: indexPath) as! UserCell
+                    let userCell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! UserCell
 //                    let identi = "ident-\(indexPath.section)-\(indexPath.row)-\(indexPath.item)-"
 //                    let nib = UINib(nibName: "UserCell", bundle: nil)
 //                    collectionView.registerNib(nib, forCellWithReuseIdentifier: identi)
 //                    let userCell = collectionView.dequeueReusableCellWithReuseIdentifier(identi, forIndexPath: indexPath) as! UserCell
                     
                     userCell.delegate = self
-                    userCell.photo = photos[indexPath.item]
+                    userCell.photo = photos[(indexPath as NSIndexPath).item]
                     cell = userCell
                     
                 } else {
-                    let messageCell = collectionView.dequeueReusableCellWithReuseIdentifier(messageCellIdentifier, forIndexPath: indexPath) as! MessageCell
+                    let messageCell = collectionView.dequeueReusableCell(withReuseIdentifier: messageCellIdentifier, for: indexPath) as! MessageCell
                     
                     messageCell.messageLabel.text = currentMessage
-                    messageCell.messageLabel.hidden = false
+                    messageCell.messageLabel.isHidden = false
                     cell = messageCell
                     
                 }
@@ -244,7 +244,7 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
         
     }
 
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         //All stuff is gestioned on UserCellDelegate
     }
     
@@ -254,9 +254,9 @@ extension FeedViewController: UICollectionViewDelegate, UICollectionViewDataSour
 // MARK: - UserCell Delegate
 extension FeedViewController: UserCellDelegate {
     
-    func didTouchPhoto(sender: UserCell) {
+    func didTouchPhoto(_ sender: UserCell) {
         
-        let senderFrame = self.collectionView.convertRect(sender.frame, toView: self.view)
+        let senderFrame = self.collectionView.convert(sender.frame, to: self.view)
         
         self.detailView.frame = senderFrame
         
@@ -272,7 +272,7 @@ extension FeedViewController: UserCellDelegate {
         
         self.activeUserCell = sender
         
-        UIView.animateWithDuration(0.6, delay: 0.0, options: .CurveEaseInOut, animations: {
+        UIView.animate(withDuration: 0.6, delay: 0.0, options: UIViewAnimationOptions(), animations: {
             
             self.detailView.frame.size.width = 400
             self.detailView.frame.size.height = 250
@@ -284,18 +284,18 @@ extension FeedViewController: UserCellDelegate {
     
     }
     
-    func didTouchFavorite(sender: UserCell) {
+    func didTouchFavorite(_ sender: UserCell) {
         
         sender.photo!.favorite = !sender.photo!.favorite
         
          self.collectionView.reloadData()
         
         let favorites = self.photos?.favoriteElements()
-        print("favorites \(favorites)")
+        print("favorites \(String(describing: favorites))")
         
     }
     
-    func didRemove(sender: UserCell) {
+    func didRemove(_ sender: UserCell) {
         
         self.photos?.removeObject(sender.photo!)
         
@@ -311,7 +311,7 @@ extension FeedViewController: UserCellDelegate {
 // MARK: - CLLocationManager Delegate
 extension FeedViewController: CLLocationManagerDelegate {
   
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         //let locValue:CLLocationCoordinate2D = manager.location!.coordinate
         //print("locations = \(locValue.latitude) \(locValue.longitude)")
         self.location = manager.location!
@@ -322,15 +322,15 @@ extension FeedViewController: CLLocationManagerDelegate {
 
 
 // MARK: - Hashtable and Equatalbe Extension for get Unique Elements genderator @see: http://stackoverflow.com/a/33553374
-public extension SequenceType where Generator.Element: Hashable {
-    var uniqueElements: [Generator.Element] {
+public extension Sequence where Iterator.Element: Hashable {
+    var uniqueElements: [Iterator.Element] {
         return Array(
             Set(self)
         )
     }
 }
-public extension SequenceType where Generator.Element: Equatable {
-    var uniqueElements: [Generator.Element] {
+public extension Sequence where Iterator.Element: Equatable {
+    var uniqueElements: [Iterator.Element] {
         return self.reduce([]){uniqueElements, element in
             uniqueElements.contains(element) ? uniqueElements : uniqueElements + [element]
         }
@@ -340,24 +340,24 @@ public extension SequenceType where Generator.Element: Equatable {
 // MARK: - Array extension for remove objects and get favorites
 extension Array where Element: User {
     
-    mutating func removeObject(object: Element) {
-        if let index = self.indexOf(object) {
-            self.removeAtIndex(index)
+    mutating func removeObject(_ object: Element) {
+        if let index = self.index(of: object) {
+            self.remove(at: index)
         }
     }
     
-    mutating func removeObjectsInArray(array: [Element]) {
+    mutating func removeObjectsInArray(_ array: [Element]) {
         for object in array {
             self.removeObject(object)
         }
     }
     
     mutating func sortByName(){
-        self.sortInPlace({ $0.name < $1.name })
+        self.sort(by: { $0.name < $1.name })
     }
     
     mutating func sortByGender(){
-        self.sortInPlace({ $0.gender < $1.gender })
+        self.sort(by: { $0.gender < $1.gender })
     }
     
     func favoriteElements() -> [User]{
@@ -366,33 +366,33 @@ extension Array where Element: User {
         }
     }
     
-    func onekmElements(location: CLLocation) -> [User]{
+    func onekmElements(_ location: CLLocation) -> [User]{
         return self.reduce([]){onekmElements, element in
-            element.fakelocation.distanceFromLocation(location) < 1000 ? onekmElements + [element] : onekmElements
+            element.fakelocation.distance(from: location) < 1000 ? onekmElements + [element] : onekmElements
         }
 
     }
     
-    func filtredElements(filtred: String) -> [User]{
+    func filtredElements(_ filtred: String) -> [User]{
         
-        if filtred.characters.count > 0 {
+        if filtred.count > 0 {
             
-            let emailList = self.filter({0
-                if $0.email.rangeOfString(filtred) != nil{
+            let emailList = self.filter({
+                if $0.email.range(of: filtred) != nil{
                     return true
                 }
                 return false
             })
             
-            let namelList = self.filter({0
-                if $0.name.rangeOfString(filtred) != nil{
+            let namelList = self.filter({
+                if $0.name.range(of: filtred) != nil{
                     return true
                 }
                 return false
             })
             
-            let surnameList = self.filter({0
-                if $0.surname.rangeOfString(filtred) != nil{
+            let surnameList = self.filter({
+                if $0.surname.range(of: filtred) != nil{
                     return true
                 }
                 return false
